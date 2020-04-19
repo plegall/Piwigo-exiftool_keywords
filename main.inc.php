@@ -16,11 +16,29 @@ if (!defined('PHPWG_ROOT_PATH'))
 add_event_handler('format_exif_data', 'ek_format_exif_data', EVENT_HANDLER_PRIORITY_NEUTRAL, 3);
 function ek_format_exif_data($exif, $filepath, $map)
 {
+  $fields = conf_get_param('ek_fields', array('Keywords', 'XPKeywords'));
+  $keywords_string = '';
+
   $output = shell_exec('exiftool -json "'.$filepath.'"');
   $metadata = json_decode($output, true);
-  if (isset($metadata[0]['XPKeywords']))
+
+  foreach ($fields as $field)
   {
-    $exif['Keywords'] = $metadata[0]['XPKeywords'];
+    if (isset($metadata[0][$field]))
+    {
+      $field_keywords_string = $metadata[0][$field];
+      if (is_array($metadata[0][$field]))
+      {
+        $field_keywords_string = implode(',', $metadata[0][$field]);
+      }
+
+      $keywords_string.= $field_keywords_string.',';
+    }
+  }
+
+  if (!empty($keywords_string))
+  {
+    $exif['Keywords'] = $keywords_string;
   }
 
   return $exif;
