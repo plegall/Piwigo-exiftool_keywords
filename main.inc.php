@@ -16,10 +16,18 @@ if (!defined('PHPWG_ROOT_PATH'))
 add_event_handler('format_exif_data', 'ek_format_exif_data', EVENT_HANDLER_PRIORITY_NEUTRAL, 3);
 function ek_format_exif_data($exif, $filepath, $map)
 {
+  include(PHPWG_ROOT_PATH . 'include/config_default.inc.php');
+  @include(PHPWG_ROOT_PATH. 'local/config/config.inc.php');
+
   $fields = conf_get_param('ek_fields', array('Keywords', 'XPKeywords'));
   $keywords_string = '';
 
-  $output = shell_exec('exiftool -json "'.$filepath.'"');
+  $output = shell_exec((isset($conf['exiftool_path']) ? $conf['exiftool_path'] : 'exiftool') . ' -json "'.$filepath.'"');
+  if (empty($output))	
+  {
+    // Something went wrong. Either exiftool or picture was not found
+    return [];
+  }
   $metadata = json_decode($output, true);
 
   foreach ($fields as $field)
