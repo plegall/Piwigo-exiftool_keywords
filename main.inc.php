@@ -41,6 +41,35 @@ function ek_format_exif_data($exif, $filepath, $map)
     $exif['Keywords'] = $keywords_string;
   }
 
+  $additional_fields = array(
+    'XPComment',
+    'Artist',
+    'Copyright',
+    'By-line',
+    'CopyrightNotice',
+    'Creator',
+    'Rights',
+    'CreatorPostalCode',
+    'CreatorRegion',
+    'CreatorWorkTelephone',
+    'CreatorCountry',
+    'CreatorCity',
+    'CreatorWorkEmail',
+    'CreatorAddress',
+    'CreatorWorkURL',
+    'Subject',
+    'LastKeywordXMP',
+    'LastKeywordIPTC',
+  );
+
+  foreach ($additional_fields as $field)
+  {
+    if (isset($metadata[0][$field]))
+    {
+      $exif[$field] = $metadata[0][$field];
+    }
+  }
+
   return $exif;
 }
 ?>
